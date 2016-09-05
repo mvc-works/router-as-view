@@ -1,6 +1,7 @@
 
 React = require 'react'
-recorder = require 'actions-recorder'
+ReactDOM = require 'react-dom'
+recorder = require 'actions-in-recorder'
 
 require '../styles/main.css'
 
@@ -20,8 +21,9 @@ defaultInfo =
 
 recorder.setup defaultInfo
 
-render = (store, core) ->
-  React.render Page(store: store, core: core), document.body
+render = (core) ->
+  target = document.querySelector('#app')
+  ReactDOM.render Page(core: core), target
 
 recorder.request render
 recorder.subscribe render

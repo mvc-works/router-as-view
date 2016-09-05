@@ -1,5 +1,5 @@
 
-recorder = require 'actions-recorder'
+recorder = require 'actions-in-recorder'
 
 exports.go = (info) ->
   console.log 'go', info

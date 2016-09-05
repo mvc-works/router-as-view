@@ -1,4 +1,5 @@
-React = require('react/addons')
+React = require('react')
+pureRenderMixin = require('react-addons-pure-render-mixin')
 Immutable = require('immutable')
 
 test = require '../../test'
@@ -6,7 +7,7 @@ actions = require('../actions')
 routes = require('../routes')
 updater = require '../updater'
 
-Devtools = React.createFactory require('actions-recorder/lib/devtools')
+Devtools = React.createFactory require('actions-in-recorder/lib/devtools')
 Addressbar = React.createFactory(require('../addressbar'))
 
 a = React.createFactory('a')
@@ -17,9 +18,13 @@ span = React.createFactory('span')
 module.exports = React.createClass
   displayName: 'app-page'
 
-  mixins: [ React.addons.pureRenderMixin ]
+  mixins: [ pureRenderMixin ]
 
-  propTypes: store: React.PropTypes.instanceOf(Immutable.Map)
+  propTypes:
+    core: React.PropTypes.instanceOf(Immutable.Map)
+
+  getInitialState: ->
+    path: Immutable.List()
 
   goDemo: ->
     actions.go
@@ -71,28 +76,27 @@ module.exports = React.createClass
 
   renderAddress: ->
     Addressbar
-      route: @props.store.get('router')
+      route: @props.core.get('store').get('router')
       rules: routes
       onPopstate: @onPopstate
       inHash: false
 
   renderDevtools: ->
+    core = @props.core
     Devtools
-      records: @props.core.records
-      pointer: @props.core.pointer
-      isTravelling: @props.core.isTravelling
-      updater: updater
-      store: @props.store
-      initial: @props.core.initial
+      core: core
       width: 800
       height: window.innerHeight
+      path: @state.path
+      onPathChange: (newState) =>
+        @setState path: newState
 
   renderBanner: ->
     div className: 'bannr',
       div className: 'heading level-2', 'Router View for React'
       div className: '',
         span(null, 'Location bar is a view! So we time travel! ')
-        a href: 'http://github.com/mvc-works/router-view', 'Read more on GitHub'
+        a href: 'http://github.com/react-china/router-as-view', 'Read more on GitHub'
         div className: 'button is-attract', onClick: @onTestClick, 'Test'
 
   renderUI: ->

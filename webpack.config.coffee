@@ -1,5 +1,4 @@
 
-fs = require('fs')
 webpack = require('webpack')
 
 module.exports =

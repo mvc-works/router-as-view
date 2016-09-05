@@ -6,7 +6,7 @@ Router View for React
 
 This project is based on `react`, `immutable` and `actions-recorder`.
 
-Demo http://router-view.mvc-works.org/
+Demo http://repo.react-china.org/router-as-view
 
 ### Initial idea
 
@@ -18,14 +18,14 @@ Ideas behind it: [Router is a View](https://hashnode.com/post/router-is-a-view-c
 ### Usage
 
 ```bash
-npm i --save router-view
+npm i --save router-as-view
 ```
 
 `M` part, add initial router object in store:
 
 ```coffee
-Addressbar = require 'router-view'
-pathUtil = require 'router-view/lib/path'
+Addressbar = require 'router-as-view'
+pathUtil = require 'router-as-view/lib/path'
 
 rules = pathUtil.expandRoutes [
   ['home', '/']
@@ -65,7 +65,7 @@ switch actionType
     store
 ```
 
-Read [`src/`](https://github.com/jianliaoim/router-view/tree/master/src) for details.
+Read [`src/`](https://github.com/jianliaoim/router-as-view/tree/master/src) for details.
 
 ### DSL
 
@@ -86,7 +86,7 @@ Parameters and querystrings are supported. Get this from store and render the pa
 
 ### Notice
 
-* keep in mind that `router-view` is totally based on `immutable-js`.
+* keep in mind that `router-as-view` is totally based on `immutable-js`.
 * if you need to route asynchronously, try set `skipRendering` to `true` during loading
 * `undefined` value is eliminated on purpose, fire an issue if you think differenly.
 
