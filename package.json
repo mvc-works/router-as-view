@@ -14,11 +14,15 @@
   ],
   "devDependencies": {
     "actions-in-recorder": "1.7.1",
+    "autoprefixer-loader": "^3.2.0",
     "coffee-loader": "^0.7.2",
     "coffee-script": "^1.10.0",
+    "coffeelint": "^1.15.7",
+    "coffeelint-loader": "^0.1.1",
     "colors": "^1.1.2",
     "css-loader": "^0.17.0",
     "del": "^1.1.1",
+    "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.4",
     "gulp": "^3.8.11",
     "gulp-coffee": "^2.3.1",
@@ -33,7 +37,8 @@
     "style-loader": "^0.12.3",
     "url-loader": "^0.5.6",
     "webpack": "^1.8.5",
-    "webpack-dev-server": "^1.8.0"
+    "webpack-dev-server": "^1.8.0",
+    "webpack-hud": "0.0.9"
   },
   "dependencies": {
     "immutable": "^3.7.5",

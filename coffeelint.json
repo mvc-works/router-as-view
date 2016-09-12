@@ -1,0 +1,6 @@
+{
+  "emitErrors": false,
+  "max_line_length": {
+    "level": "ignore"
+  }
+}
