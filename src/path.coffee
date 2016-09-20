@@ -94,7 +94,10 @@ addressRunner = (acc, router, rules, query) ->
   if not router?
     queryPart = stringifyQuery query
     if queryPart.length > 0
-      "#{acc}?#{queryPart}"
+      if acc.length > 0
+        "#{acc[...-1]}?#{queryPart}"
+      else
+        queryPart
     else
       acc
   else

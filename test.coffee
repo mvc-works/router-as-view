@@ -32,53 +32,30 @@ testLongQueryParse = ->
   expected = {"gsm":"0","lm":"-1","st":"-1","ln":"1000","oriquery":"","adpicid":"0","cg":"","os":"1619671487,69261469","istype":"2","di":"1712569540","in":"","fromurl":"ippr_z2C$qAzdH3FAzdH3F65ss_z&e3Bf5i7_z&e3Bv54AzdH3Fda8888adAzdH3Fgnd9dmcl0m_z&e3Bfip4s","width":"","ipn":"d","fm":"","height":"","cl":"2","fmq":"1457507365044_R","ist":"","is":"","word":"途安","sme":"","fr":"","cs":"2464434574,440997798","ct":"503316480","spn":"0","simid":"3496201219,355884747","se":"","s":"undefined","jit":"","tab":"0","oe":"utf-8","objurl":"http://photocdn.sohu.com/20111102/Img324265977.jpg","pi":"","z":"0","ic":"0","tn":"baiduimagedetail","ie":"utf-8","rn":"1","bdtype":"0","step_word":"","face":"undefined","pn":"0"}
   assert.deepEqual result.toJS(), expected
 
-testStringify = ->
-  console.log '* test on stringify'
-  info = fromJS
-    path: ['a', 'b']
-    query:
-      a: '1'
-      b: '2'
-  expected = '/a/b?a=1&b=2'
-  assert.equal pathUtil.stringify(info), expected
-
-  info = fromJS
-    path: ['a', 'b']
-    query: {}
-  expected = '/a/b'
-  assert.equal pathUtil.stringify(info), expected
-
-  info = fromJS
-    path: []
-    query:
-      a: '1'
-  expected = '/?a=1'
-  assert.equal pathUtil.stringify(info), expected
-
 testMakeAddress = ->
   console.log '* test make address'
-  routes = pathUtil.expandRoutes fromJS [['a', '/b/:c/d']]
+  routes = fromJS a: [], b: ['c']
   route = fromJS
-    name: 'a'
+    name: 'b'
     data:
       c: '1'
     query:
       a: 'x'
-  result = pathUtil.makeAddress routes, route
-  expected = '/b/1/d?a=x'
+  result = pathUtil.makeAddress route, routes
+  expected = '/b/1?a=x'
   assert.equal result, expected
 
 testMakeChineseAddress = ->
   console.log '* test make chinese address'
-  routes = pathUtil.expandRoutes fromJS [['a', '/中文/:name']]
+  routes = fromJS a: [], '中文': ['name']
   route = fromJS
-    name: 'a'
+    name: '中文'
     data:
       name: '中文'
     query:
       '中文': '中文'
-  result = pathUtil.makeAddress routes, route
-  expected = encodeURI("/中文/中文?中文=中文")
+  result = pathUtil.makeAddress route, routes
+  expected = '/中文/中文?%E4%B8%AD%E6%96%87=%E4%B8%AD%E6%96%87'
   assert.equal result, expected
 
 # Run
@@ -89,7 +66,6 @@ exports.run = ->
   testQueryParse()
   testChineseQueryParse()
   testLongQueryParse()
-  testStringify()
   testMakeAddress()
   testMakeChineseAddress()
 
