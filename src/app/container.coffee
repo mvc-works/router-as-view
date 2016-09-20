@@ -2,7 +2,6 @@ React = require('react')
 pureRenderMixin = require('react-addons-pure-render-mixin')
 Immutable = require('immutable')
 
-test = require '../../test'
 actions = require('../actions')
 routes = require('../routes')
 updater = require '../updater'
@@ -16,7 +15,7 @@ pre = React.createFactory('pre')
 span = React.createFactory('span')
 
 module.exports = React.createClass
-  displayName: 'app-page'
+  displayName: 'app-container'
 
   mixins: [ pureRenderMixin ]
 
@@ -48,11 +47,15 @@ module.exports = React.createClass
       query: {}
   goRoom: ->
     actions.go
-      name: 'room'
+      name: 'team'
       data:
         teamId: '23'
-        roomId: '34'
       query: {}
+      router:
+        name: 'room'
+        data:
+          roomId: '34'
+        query: {}
   goQuery: ->
     actions.go
       name: 'room'
@@ -71,15 +74,12 @@ module.exports = React.createClass
   onPopstate: (info, event) ->
     actions.go info.toJS()
 
-  onTestClick: ->
-    test.run()
-
   renderAddress: ->
     Addressbar
       route: @props.core.get('store').get('router')
       rules: routes
       onPopstate: @onPopstate
-      inHash: false
+      inHash: true
 
   renderDevtools: ->
     core = @props.core
@@ -97,7 +97,6 @@ module.exports = React.createClass
       div className: '',
         span(null, 'Location bar is a view! So we time travel! ')
         a href: 'http://github.com/react-china/router-as-view', 'Read more on GitHub'
-        div className: 'button is-attract', onClick: @onTestClick, 'Test'
 
   renderUI: ->
     div className: 'app-ui',

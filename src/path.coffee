@@ -30,7 +30,9 @@ routerBase = Immutable.fromJS
 
 parsePathSegments = (pathSegments, rules, theQuery) ->
   if pathSegments.size is 0
-    null
+    routerBase
+    .set 'name', 'home'
+    .set 'query', theQuery
   else
     pathName = pathSegments.get 0
     if rules.has(pathName)
@@ -61,7 +63,8 @@ parsePathSegments = (pathSegments, rules, theQuery) ->
       .set 'name', '404'
       .set 'query', theQuery
 
-parseAddress = (address) ->
+parseAddress = (address, rules) ->
+  console.log address, rules
   [chunkPath, chunkQuery] = address.split('?')
   chunkQuery = chunkQuery or ''
 
@@ -75,13 +78,8 @@ parseAddress = (address) ->
 
   parsePathSegments pathSegments, rules, theQuery
 
-fill = (pieces, data) ->
-  pieces.map (chunk) ->
-    if chunk.substr(0, 1) == ':' then data.get(chunk.substr(1)) else chunk
-
-stringify = (info) ->
-  stringPath = info.get('path').map(encodeURIComponent).join('/')
-  stringQuery = info.get('query')
+stringifyQuery = (query) ->
+  stringQuery = query
   .filter (value, key) ->
     value?
   .map (value, key) ->
@@ -90,26 +88,30 @@ stringify = (info) ->
     "#{key}=#{value}"
   .join '&'
 
-  if (stringQuery.length > 0)
-    "/#{stringPath}?#{stringQuery}"
-  else
-    "/#{stringPath}"
-
-addressRunner = (acc, router, rules) ->
+addressRunner = (acc, router, rules, query) ->
   if not router?
-    acc
+    "#{acc}?#{stringifyQuery query}"
   else
     routerName = router.get 'name'
-    argsTemplate = rules.get routerName
-    args = argsTemplate.map (argName) ->
-      router.get('data').get(argName)
-    nextAcc = "#{acc}/#{routerName}/#{args.join '/'}/#{child}"
-    addressRunner nextAcc, router.get('router'), rules
-
-  stringify newInfo
+    if rules.has(routerName)
+      argsTemplate = rules.get routerName
+      args = argsTemplate.map (argName) ->
+        router.get('data').get(argName)
+      pieces = args.unshift routerName
+      nextAcc = "#{acc}#{pieces.join '/'}/"
+      console.log 'routerName', JSON.stringify(routerName)
+      console.log 'args', JSON.stringify(args)
+      nextRouter = router.get('router')
+      nextQuery = if nextRouter? then nextRouter.get('query') else o
+      console.log 'nextAcc', JSON.stringify(nextAcc)
+      addressRunner nextAcc, nextRouter, rules, nextQuery
+    else
+      "#{acc}404"
 
 makeAddress = (router, rules) ->
-  addressRunner '/', router, rules
+  addressRunner '/', router, rules, router.get('query')
 
+exports.trimSlash = trimSlash
+exports.parseQuery = parseQuery
 exports.makeAddress = makeAddress
 exports.parseAddress = parseAddress
