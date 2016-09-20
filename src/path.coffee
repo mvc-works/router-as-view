@@ -47,7 +47,10 @@ parsePathSegments = (pathSegments, rules, theQuery) ->
           acc.set argName, restOfSegments.get(idx)
         , o
         nextPathSegments = restOfSegments.slice(argsTemplate.size)
-        childRouter = parsePathSegments nextPathSegments, rules, theQuery
+        if nextPathSegments.size > 0
+          childRouter = parsePathSegments nextPathSegments, rules, theQuery
+        else
+          childRouter = null
         if childRouter?
           routerBase
           .set 'name', pathName
@@ -64,7 +67,6 @@ parsePathSegments = (pathSegments, rules, theQuery) ->
       .set 'query', theQuery
 
 parseAddress = (address, rules) ->
-  console.log address, rules
   [chunkPath, chunkQuery] = address.split('?')
   chunkQuery = chunkQuery or ''
 
@@ -90,7 +92,11 @@ stringifyQuery = (query) ->
 
 addressRunner = (acc, router, rules, query) ->
   if not router?
-    "#{acc}?#{stringifyQuery query}"
+    queryPart = stringifyQuery query
+    if queryPart.length > 0
+      "#{acc}?#{queryPart}"
+    else
+      acc
   else
     routerName = router.get 'name'
     if rules.has(routerName)
@@ -99,11 +105,8 @@ addressRunner = (acc, router, rules, query) ->
         router.get('data').get(argName)
       pieces = args.unshift routerName
       nextAcc = "#{acc}#{pieces.join '/'}/"
-      console.log 'routerName', JSON.stringify(routerName)
-      console.log 'args', JSON.stringify(args)
       nextRouter = router.get('router')
-      nextQuery = if nextRouter? then nextRouter.get('query') else o
-      console.log 'nextAcc', JSON.stringify(nextAcc)
+      nextQuery = router.get('query') or o
       addressRunner nextAcc, nextRouter, rules, nextQuery
     else
       "#{acc}404"

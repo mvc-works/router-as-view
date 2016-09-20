@@ -6,7 +6,6 @@ recorder = require 'actions-in-recorder'
 Immutable = require 'immutable'
 installDevTools = require 'immutable-devtools'
 
-
 require '../styles/main.css'
 
 schema = require './schema'

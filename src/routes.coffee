@@ -10,4 +10,4 @@ module.exports = Immutable.fromJS
   skip: []
   team: ['teamId']
   room: ['roomId']
-  '中文': []
+  '中文': ['中文']

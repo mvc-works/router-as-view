@@ -58,16 +58,21 @@ module.exports = React.createClass
         query: {}
   goQuery: ->
     actions.go
-      name: 'room'
+      name: 'team'
       data:
         teamId: '23'
-        roomId: '34'
-      query: isPrivate: 'true'
+      query: {}
+      router:
+        name: 'room'
+        data:
+          roomId: '34'
+        query:
+          isPrivate: 'true'
   goChinese: ->
     actions.go
-      name: 'chinese'
+      name: '中文'
       data:
-        name: '中文'
+        '中文': '中文'
       query:
         '中文': '中文'
 
@@ -111,14 +116,11 @@ module.exports = React.createClass
         div className: 'button is-attract', onClick: @goRoom, 'goRoom'
         div className: 'button is-attract', onClick: @goQuery, 'goQuery'
         div className: 'button is-attract', onClick: @goChinese, 'goChinese'
-      div className: 'line',
-        span(null, 'Also try: ')
-        a({ href: '/skip/whatever/path' }, '/skip/whatever/path')
       div(className: 'page-divider')
       div { className: 'line' },
         span({ className: 'is-bold' }, 'Store is:')
       pre { className: 'page-content' },
-        JSON.stringify(@props.store, null, 2)
+        JSON.stringify(@props.core.get('store'), null, 2)
 
   render: ->
     div className: 'app-page',
