@@ -104,13 +104,16 @@ addressRunner = (acc, router, rules, query) ->
     routerName = router.get 'name'
     if rules.has(routerName)
       argsTemplate = rules.get routerName
-      args = argsTemplate.map (argName) ->
-        router.get('data').get(argName)
-      pieces = args.unshift routerName
-      nextAcc = "#{acc}#{pieces.join '/'}/"
-      nextRouter = router.get('router')
       nextQuery = router.get('query') or o
-      addressRunner nextAcc, nextRouter, rules, nextQuery
+      if routerName is 'home' and argsTemplate.size is 0
+        addressRunner acc, null, rules, nextQuery
+      else
+        args = argsTemplate.map (argName) ->
+          router.get('data').get(argName)
+        pieces = args.unshift routerName
+        nextAcc = "#{acc}#{pieces.join '/'}/"
+        nextRouter = router.get('router')
+        addressRunner nextAcc, nextRouter, rules, nextQuery
     else
       "#{acc}404"
 

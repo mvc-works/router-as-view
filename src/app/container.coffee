@@ -35,11 +35,6 @@ module.exports = React.createClass
       name: 'home'
       data: null
       query: {}
-  goSkip: ->
-    actions.go
-      name: 'skip'
-      data: null
-      query: {}
   goTeam: ->
     actions.go
       name: 'team'
@@ -111,7 +106,6 @@ module.exports = React.createClass
       div className: 'line',
         div className: 'button is-attract', onClick: @goHome, 'goHome'
         div className: 'button is-attract', onClick: @goDemo, 'goDemo'
-        div className: 'button is-attract', onClick: @goSkip, 'goSkip'
         div className: 'button is-attract', onClick: @goTeam, 'goTeam'
         div className: 'button is-attract', onClick: @goRoom, 'goRoom'
         div className: 'button is-attract', onClick: @goQuery, 'goQuery'
