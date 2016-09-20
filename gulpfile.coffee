@@ -15,7 +15,7 @@ gulp.task 'rsync', (cb) ->
     src: [ 'build/*' ]
     recursive: true
     args: [ '--verbose' ]
-    dest: 'tiye:~/repo/workflow/'
+    dest: 'repo.react-china.org:~/repo/react-china/router-as-view/'
     deleteAll: true
   , (error, stdout, stderr, cmd) ->
     if error != null

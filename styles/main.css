@@ -10,7 +10,6 @@ body * {
 .app-page {
   display: flex;
   flex-direction: row;
-  background-image: url(../images/traffic.jpg);
   background-size: cover;
   background-position: center center;
   height: 100%;
