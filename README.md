@@ -1,5 +1,5 @@
 
-Router View for React
+Router as a View in React
 ----
 
 > Location bar is a view of store
@@ -27,18 +27,17 @@ npm i --save router-as-view
 Addressbar = require 'router-as-view'
 pathUtil = require 'router-as-view/lib/path'
 
-rules = pathUtil.expandRoutes [
-  ['home', '/']
-  ['demo', '/demo']
-  ['skip', '/skip/~']
-  ['team', '/team/:teamId']
-  ['room', '/team/:teamId/room/:roomId']
-  ['404', '~']
-]
+rules =  = Immutable.fromJS
+  home: []
+  demo: []
+  skip: []
+  team: ['teamId']
+  room: ['roomId']
+  '中文': ['中文']
 
-oldAddress = "#{location.pathname}#{location.search}" # for history API
-# oldAddress = location.hash.substr(1) # for hash
-router = pathUtil.getCurrentInfo rules, oldAddress
+# oldAddress = "#{location.pathname}#{location.search}" # for history API
+oldAddress = location.hash.substr(1) # for hash
+router = pathUtil.parseAddress oldAddress, rules
 store = store.set 'router', router
 ```
 
@@ -47,10 +46,10 @@ store = store.set 'router', router
 ```coffee
 Addressbar
   route: store.get('router')
-  rules: routes
+  rules: rules
   onPopstate: (info, event) ->
     # figure out the new router object and dispatch a `router/go` action
-  inHash: false # fallback to hash from history API
+  inHash: true # fallback to hash from history API
   skipRendering: false # true to allow model/view inconsistency during loading
 ```
 
@@ -74,12 +73,17 @@ Read [`src/`](https://github.com/jianliaoim/router-as-view/tree/master/src) for 
 And in store the route information (`info`) is like:
 
 ```coffee
-name: 'room'
+name: 'team'
 data:
   teamId: '12'
-  roomId: '34'
 query:
   isPrivate: 'true'
+router:
+  name: 'room'
+  data:
+    roomId: '34'
+  query: {}
+  router: null
 ```
 
 Parameters and querystrings are supported. Get this from store and render the page.

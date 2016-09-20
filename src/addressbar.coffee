@@ -16,7 +16,7 @@ module.exports = React.createClass
     skipRendering: React.PropTypes.bool
 
   getDefaultProps: ->
-    inHash: false
+    inHash: true
     skipRendering: false
 
   inHash: ->
