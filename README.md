@@ -27,19 +27,23 @@ npm i --save router-as-view
 Addressbar = require 'router-as-view'
 pathUtil = require 'router-as-view/lib/path'
 
-rules =  = Immutable.fromJS
-  home: []
-  demo: []
-  skip: []
-  team: ['teamId']
-  room: ['roomId']
-  '中文': ['中文']
+rules = Immutable.fromJS
+  home: [] # means / or /home
+  demo: [] # means /demo
+  team: ['teamId'] # means /team/:teamId
+  room: ['roomId'] # means /room/:roomId
+  '中文': ['中文'] # means /中文/:中文
 
 # oldAddress = "#{location.pathname}#{location.search}" # for history API
-oldAddress = location.hash.substr(1) # for hash
+oldAddress = location.hash.substr(1) # to remove sharp mark
 router = pathUtil.parseAddress oldAddress, rules
 store = store.set 'router', router
 ```
+
+Notice that 2 of the paths are different:
+
+* `home` is generated when `/` or `/home` is found
+* `404` is generated when no router is found
 
 "V" part, mount `Addressbar` component to manipulate History API:
 
@@ -67,8 +71,6 @@ switch actionType
 Read [`src/`](https://github.com/jianliaoim/router-as-view/tree/master/src) for details.
 
 ### DSL
-
-`~` refers to "any path" in this library.
 
 And in store the route information (`info`) is like:
 
