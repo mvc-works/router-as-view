@@ -4,7 +4,8 @@
   "description": "Router view for React",
   "main": "./lib/addressbar",
   "scripts": {
-    "test": "coffee test.coffee"
+    "test": "coffee test.coffee",
+    "prepublish": "gulp script"
   },
   "author": "jiyinyiyong",
   "license": "MIT",
