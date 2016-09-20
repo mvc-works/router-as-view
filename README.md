@@ -21,7 +21,7 @@ Ideas behind it: [Router is a View](https://hashnode.com/post/router-is-a-view-c
 npm i --save router-as-view
 ```
 
-`M` part, add initial router object in store:
+Router DSL is defined in an immutable Map:
 
 ```coffee
 Addressbar = require 'router-as-view'
@@ -44,6 +44,25 @@ Notice that 2 of the paths are different:
 
 * `home` is generated when `/` or `/home` is found
 * `404` is generated when no router is found
+
+
+`M` part, add initial router object in store. It looks like:
+
+```coffee
+name: 'team'
+data:
+  teamId: '12'
+query:
+  isPrivate: 'true'
+router: # nested router is parsed from address directly
+  name: 'room'
+  data:
+    roomId: '34'
+  query: {}
+  router: null
+```
+
+Parameters and querystrings are supported. Get this from store and render the page.
 
 "V" part, mount `Addressbar` component to manipulate History API:
 
@@ -70,35 +89,11 @@ switch actionType
 
 Read [`src/`](https://github.com/jianliaoim/router-as-view/tree/master/src) for details.
 
-### DSL
-
-And in store the route information (`info`) is like:
-
-```coffee
-name: 'team'
-data:
-  teamId: '12'
-query:
-  isPrivate: 'true'
-router:
-  name: 'room'
-  data:
-    roomId: '34'
-  query: {}
-  router: null
-```
-
-Parameters and querystrings are supported. Get this from store and render the page.
-
 ### Notice
 
 * keep in mind that `router-as-view` is totally based on `immutable-js`.
 * if you need to route asynchronously, try set `skipRendering` to `true` during loading
 * `undefined` value is eliminated on purpose, fire an issue if you think differenly.
-
-### Theme
-
-http://archwall.xyz/wp-content/uploads/2015/09/skyscrapers-city-sleeps-blue-ocean-skyscrapers-sky-aerial-skyline-beautiful-evening-streets-buildings-lights-traffic-night-shore-free-wallpapers.jpg
 
 ### License
 
