@@ -3,12 +3,11 @@ pathUtil = require './path'
 
 Immutable = require 'immutable'
 
-module.exports = pathUtil.expandRoutes [
-  ['home', '/']
-  ['demo', '/demo']
-  ['skip', '/skip/~']
-  ['team', '/team/:teamId']
-  ['room', '/team/:teamId/room/:roomId']
-  ['chinese', '/中文/:name']
-  ['404', '404']
-]
+# assume router in format of `/a/:a-arg1/:arg-n/b/b-arg1`
+module.exports = Immutable.fromJS
+  home: []
+  demo: []
+  skip: []
+  team: ['teamId']
+  room: ['roomId']
+  '中文': []

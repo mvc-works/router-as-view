@@ -198,7 +198,6 @@ testMakeChineseAddress = ->
 # Run
 
 exports.run = ->
-  console.group "Running test..."
 
   testTrimSlash()
   testQueryParse()
@@ -211,4 +210,4 @@ exports.run = ->
   testMakeAddress()
   testMakeChineseAddress()
 
-  console.groupEnd()
+exports.run()

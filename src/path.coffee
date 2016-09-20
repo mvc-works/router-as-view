@@ -1,14 +1,17 @@
 
 Immutable = require 'immutable'
 
-exports.trimSlash = trimSlash = (chunk) ->
+{fromJS} = Immutable
+o = Immutable.Map()
+
+trimSlash = (chunk) ->
   if chunk.substr(0, 1) is '/'
     trimSlash chunk.substr(1)
   else if chunk.substr(-1) is '/'
     trimSlash chunk.substr(0, chunk.length-1)
   else chunk
 
-exports.queryParse = queryParse = (data, chunks) ->
+parseQuery = (data, chunks) ->
   if (chunks.size is 0)
     data
   else
@@ -17,22 +20,66 @@ exports.queryParse = queryParse = (data, chunks) ->
     [key, value] = pieces
     key = decodeURIComponent key
     value = decodeURIComponent value
-    queryParse data.set(key, value), chunks.slice(1)
+    parseQuery data.set(key, value), chunks.slice(1)
 
-o = Immutable.Map()
-exports.parse = (segment) ->
-  [chunkPath, chunkQuery] = segment.split('?')
-  chunkPath = trimSlash(chunkPath)
+routerBase = Immutable.fromJS
+  name: null
+  data: {}
+  query: {}
+  router: null
+
+parsePathSegments = (pathSegments, rules, theQuery) ->
+  if pathSegments.size is 0
+    null
+  else
+    pathName = pathSegments.get 0
+    if rules.has(pathName)
+      argsTemplate = rules.get pathName
+      restOfSegments = pathSegments.rest()
+      if restOfSegments.size < argsTemplate.size
+        routerBase
+        .set 'name', '404'
+        .set 'query', theQuery
+      else
+        data = argsTemplate.reduce (acc, argName, idx) ->
+          acc.set argName, restOfSegments.get(idx)
+        , o
+        nextPathSegments = restOfSegments.slice(argsTemplate.size)
+        childRouter = parsePathSegments nextPathSegments, rules, theQuery
+        if childRouter?
+          routerBase
+          .set 'name', pathName
+          .set 'data', data
+          .set 'router', childRouter
+        else
+          routerBase
+          .set 'name', pathName
+          .set 'data', data
+          .set 'query', theQuery
+    else
+      routerBase
+      .set 'name', '404'
+      .set 'query', theQuery
+
+parseAddress = (address) ->
+  [chunkPath, chunkQuery] = address.split('?')
   chunkQuery = chunkQuery or ''
+
+  chunkPath = trimSlash(chunkPath)
   thePath = if (chunkPath.length > 0) then chunkPath.split('/') else []
-  thePath = thePath.map decodeURIComponent
+  pathSegments = Immutable.fromJS(thePath.map decodeURIComponent)
   if chunkQuery.length > 0
-    theQuery = queryParse o, Immutable.fromJS(chunkQuery.split('&'))
+    theQuery = parseQuery o, Immutable.fromJS(chunkQuery.split('&'))
   else
     theQuery = o
-  Immutable.fromJS(path: thePath, query: theQuery)
 
-exports.stringify = (info) ->
+  parsePathSegments pathSegments, rules, theQuery
+
+fill = (pieces, data) ->
+  pieces.map (chunk) ->
+    if chunk.substr(0, 1) == ':' then data.get(chunk.substr(1)) else chunk
+
+stringify = (info) ->
   stringPath = info.get('path').map(encodeURIComponent).join('/')
   stringQuery = info.get('query')
   .filter (value, key) ->
@@ -48,71 +95,21 @@ exports.stringify = (info) ->
   else
     "/#{stringPath}"
 
-exports.fill = (pieces, data) ->
-  pieces.map (chunk) ->
-    if chunk.substr(0, 1) == ':' then data.get(chunk.substr(1)) else chunk
-
-matchHelper = (pieces, rulePieces, result) ->
-  allLong = pieces.size > 0 and rulePieces.size > 0
-  allEnd = pieces.size == 0 and rulePieces.size == 0
-
-  switch
-    when result.get('skipped') then result
-    when allEnd then result
-    when allLong
-      rule = rulePieces.get(0)
-      piece = pieces.get(0)
-      switch
-        when rule is '~' then result.set 'skipped', true
-        when rule.substr(0, 1) is ':'
-          newResult = result.setIn(['data', rule.substr(1)], piece)
-          matchHelper pieces.slice(1), rulePieces.slice(1), newResult
-        when rule is piece then matchHelper pieces.slice(1), rulePieces.slice(1), result
-        else result.set 'failed', true
-    else result.set 'failed', true
-
-exports.match = (pieces, rulePieces) ->
-  # console.log :match (pieces.toJS) (rulePieces.toJS)
-  result = matchHelper(pieces, rulePieces, Immutable.fromJS(
-    failed: false
-    skipped: false
-    data: {}))
-  # console.log :result (result.toJS)
-  result
-
-exports.getCurrentInfo = (rules, address) ->
-  addressInfo = exports.parse(address)
-  targetRule = rules.reduce (acc, rule) ->
-    if acc.get('failed')
-      result = exports.match(addressInfo.get('path'), rule.get('path'))
-      result.set 'name', rule.get('name')
-    else acc
-  , Immutable.fromJS(failed: true)
-  info = null
-  if targetRule.get('failed')
-    Immutable.Map
-      name: '404'
-      data: null
-      query: addressInfo.get('query')
+addressRunner = (acc, router, rules) ->
+  if not router?
+    acc
   else
-    Immutable.Map
-      name: targetRule.get('name')
-      data: targetRule.get('data')
-      query: addressInfo.get('query')
+    routerName = router.get 'name'
+    argsTemplate = rules.get routerName
+    args = argsTemplate.map (argName) ->
+      router.get('data').get(argName)
+    nextAcc = "#{acc}/#{routerName}/#{args.join '/'}/#{child}"
+    addressRunner nextAcc, router.get('router'), rules
 
-exports.expandRoutes = (rules) ->
-  Immutable.fromJS(rules).map (pair) ->
-    name = pair.get(0)
-    rule = pair.get(1)
-    info = exports.parse(rule)
-    info.set 'name', name
+  stringify newInfo
 
-exports.makeAddress = (expandedRoutes, route) ->
-  # console.log :address (this.state.rules.toJS) (this.props.router.toJS)
-  info = expandedRoutes.find (ruleInfo) ->
-    ruleInfo.get('name') is route.get('name')
-  newInfo = info
-  .set 'path', exports.fill (info.get 'path'), route.get('data')
-  .set 'query', route.get('query')
+makeAddress = (router, rules) ->
+  addressRunner '/', router, rules
 
-  exports.stringify newInfo
+exports.makeAddress = makeAddress
+exports.parseAddress = parseAddress
