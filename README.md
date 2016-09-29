@@ -27,7 +27,7 @@ Router DSL is defined in an immutable Map:
 Addressbar = require 'router-as-view'
 pathUtil = require 'router-as-view/lib/path'
 
-rules = Immutable.fromJS
+routes = Immutable.fromJS
   home: [] # means / or /home
   demo: [] # means /demo
   team: ['teamId'] # means /team/:teamId
@@ -36,7 +36,7 @@ rules = Immutable.fromJS
 
 # oldAddress = "#{location.pathname}#{location.search}" # for history API
 oldAddress = location.hash.substr(1) # to remove sharp mark
-router = pathUtil.parseAddress oldAddress, rules
+router = pathUtil.parseAddress oldAddress, routes
 store = store.set 'router', router
 ```
 
@@ -68,8 +68,8 @@ Parameters and querystrings are supported. Get this from store and render the pa
 
 ```coffee
 Addressbar
-  route: store.get('router')
-  rules: rules
+  router: store.get('router')
+  routes: routes
   onPopstate: (info, event) ->
     # figure out the new router object and dispatch a `router/go` action
   inHash: true # fallback to hash from history API

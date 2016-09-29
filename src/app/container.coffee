@@ -52,17 +52,18 @@ module.exports = React.createClass
           roomId: '34'
         query: {}
   goQuery: ->
-    actions.go
-      name: 'team'
-      data:
-        teamId: '23'
-      query: {}
-      router:
-        name: 'room'
-        data:
-          roomId: '34'
-        query:
-          isPrivate: 'true'
+    actions.nav 'team/23/room/34?isPrivate=true'
+    # actions.go
+    #   name: 'team'
+    #   data:
+    #     teamId: '23'
+    #   query: {}
+    #   router:
+    #     name: 'room'
+    #     data:
+    #       roomId: '34'
+    #     query:
+    #       isPrivate: 'true'
   goChinese: ->
     actions.go
       name: '中文'
@@ -76,8 +77,8 @@ module.exports = React.createClass
 
   renderAddress: ->
     Addressbar
-      route: @props.core.get('store').get('router')
-      rules: routes
+      router: @props.core.get('store').get('router')
+      routes: routes
       onPopstate: @onPopstate
       inHash: true
 

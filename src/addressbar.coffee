@@ -9,8 +9,8 @@ module.exports = React.createClass
   displayName: 'addressbar'
 
   propTypes:
-    route: React.PropTypes.instanceOf(Immutable.Map).isRequired
-    rules: React.PropTypes.instanceOf(Immutable.Map).isRequired
+    router: React.PropTypes.instanceOf(Immutable.Map).isRequired
+    routes: React.PropTypes.instanceOf(Immutable.Map).isRequired
     onPopstate: React.PropTypes.func.isRequired
     inHash: React.PropTypes.bool
     skipRendering: React.PropTypes.bool
@@ -36,7 +36,7 @@ module.exports = React.createClass
 
   onPopstate: (event) ->
     address = location.pathname + (location.search or '')
-    info = pathUtil.parseAddress address, @props.rules
+    info = pathUtil.parseAddress address, @props.routes
     @props.onPopstate info, event
 
   onHashchange: ->
@@ -44,12 +44,12 @@ module.exports = React.createClass
       # changing hash in JavaScript will trigger event, by pass
       return
     address = location.hash.substr(1)
-    info = pathUtil.parseAddress address, @props.rules
+    info = pathUtil.parseAddress address, @props.routes
     @props.onPopstate info
 
   renderInHistory: (address) ->
-    routes = @props.rules
-    address = pathUtil.makeAddress @props.route, routes
+    routes = @props.routes
+    address = pathUtil.makeAddress @props.router, routes
     if location.search?
       oldAddress = "#{location.pathname}#{location.search}"
     else
@@ -59,8 +59,8 @@ module.exports = React.createClass
       history.pushState null, null, address
 
   renderInHash: (address) ->
-    routes = @props.rules
-    address = pathUtil.makeAddress @props.route, routes
+    routes = @props.routes
+    address = pathUtil.makeAddress @props.router, routes
 
     oldAddress = location.hash.substr(1)
 

@@ -28,15 +28,15 @@ routerBase = Immutable.fromJS
   query: {}
   router: null
 
-parsePathSegments = (pathSegments, rules, theQuery) ->
+parsePathSegments = (pathSegments, routes, theQuery) ->
   if pathSegments.size is 0
     routerBase
     .set 'name', 'home'
     .set 'query', theQuery
   else
     pathName = pathSegments.get 0
-    if rules.has(pathName)
-      argsTemplate = rules.get pathName
+    if routes.has(pathName)
+      argsTemplate = routes.get pathName
       restOfSegments = pathSegments.rest()
       if restOfSegments.size < argsTemplate.size
         routerBase
@@ -48,7 +48,7 @@ parsePathSegments = (pathSegments, rules, theQuery) ->
         , o
         nextPathSegments = restOfSegments.slice(argsTemplate.size)
         if nextPathSegments.size > 0
-          childRouter = parsePathSegments nextPathSegments, rules, theQuery
+          childRouter = parsePathSegments nextPathSegments, routes, theQuery
         else
           childRouter = null
         if childRouter?
@@ -66,7 +66,7 @@ parsePathSegments = (pathSegments, rules, theQuery) ->
       .set 'name', '404'
       .set 'query', theQuery
 
-parseAddress = (address, rules) ->
+parseAddress = (address, routes) ->
   [chunkPath, chunkQuery] = address.split('?')
   chunkQuery = chunkQuery or ''
 
@@ -78,7 +78,7 @@ parseAddress = (address, rules) ->
   else
     theQuery = o
 
-  parsePathSegments pathSegments, rules, theQuery
+  parsePathSegments pathSegments, routes, theQuery
 
 stringifyQuery = (query) ->
   stringQuery = query
@@ -90,35 +90,35 @@ stringifyQuery = (query) ->
     "#{key}=#{value}"
   .join '&'
 
-addressRunner = (acc, router, rules, query) ->
+addressRunner = (acc, router, routes, query) ->
   if not router?
     queryPart = stringifyQuery query
     if queryPart.length > 0
       if acc.length > 0
-        "#{acc[...-1]}?#{queryPart}"
+        "#{acc}?#{queryPart}"
       else
         queryPart
     else
       acc
   else
     routerName = router.get 'name'
-    if rules.has(routerName)
-      argsTemplate = rules.get routerName
+    if routes.has(routerName)
+      argsTemplate = routes.get routerName
       nextQuery = router.get('query') or o
       if routerName is 'home' and argsTemplate.size is 0
-        addressRunner acc, null, rules, nextQuery
+        addressRunner acc, null, routes, nextQuery
       else
         args = argsTemplate.map (argName) ->
           router.get('data').get(argName)
         pieces = args.unshift routerName
-        nextAcc = "#{acc}#{pieces.join '/'}/"
+        nextAcc = "#{acc}/#{pieces.join '/'}"
         nextRouter = router.get('router')
-        addressRunner nextAcc, nextRouter, rules, nextQuery
+        addressRunner nextAcc, nextRouter, routes, nextQuery
     else
-      "#{acc}404"
+      "#{acc}/404"
 
-makeAddress = (router, rules) ->
-  addressRunner '/', router, rules, router.get('query')
+makeAddress = (router, routes) ->
+  addressRunner '', router, routes, router.get('query')
 
 exports.trimSlash = trimSlash
 exports.parseQuery = parseQuery
