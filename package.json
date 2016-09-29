@@ -1,6 +1,6 @@
 {
   "name": "router-as-view",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Router view for React",
   "main": "./lib/addressbar",
   "scripts": {

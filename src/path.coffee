@@ -99,7 +99,7 @@ addressRunner = (acc, router, routes, query) ->
       else
         queryPart
     else
-      acc
+      if acc is '' then '/' else acc
   else
     routerName = router.get 'name'
     if routes.has(routerName)
