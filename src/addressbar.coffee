@@ -28,7 +28,7 @@ module.exports = React.createClass
     else
       window.addEventListener 'popstate', @onPopstate
 
-  conponentWillUnMount: ->
+  componentWillUnmount: ->
     if @inHash()
       window.removeEventListener 'hashchange', @onHashchange
     else
