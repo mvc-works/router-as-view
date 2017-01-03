@@ -97,7 +97,7 @@ addressRunner = (acc, router, routes, query) ->
       if acc.length > 0
         "#{acc}?#{queryPart}"
       else
-        queryPart
+        "?#{queryPart}"
     else
       if acc is '' then '/' else acc
   else
